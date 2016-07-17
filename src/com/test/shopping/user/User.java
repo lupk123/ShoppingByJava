@@ -3,7 +3,9 @@ package com.test.shopping.user;
 import com.test.shopping.util.DB;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/7/15.
@@ -64,6 +66,9 @@ public class User {
         this.rdate = rdate;
     }
 
+    /**
+     * 注册用户
+     */
     public void insert(){
         Connection conn = DB.getConn();
         String sql = "insert into user values(null, ?, ?, ?, ?, ?)";
@@ -84,6 +89,12 @@ public class User {
         }
     }
 
+    /**
+     * 用户登录
+     * @param username 用户名
+     * @param password 密码
+     * @return User类
+     */
     public static User check(String username, String password){
         Connection conn = DB.getConn();
         Statement stmt = DB.getStatement(conn);
@@ -113,5 +124,74 @@ public class User {
             DB.close(conn);
         }
         return user;
+    }
+
+    /**
+     * 获取用户列表
+     * @return 用户列表
+     */
+    public static List<User> getUsers(){
+        Connection conn = DB.getConn();
+        Statement stmt = DB.getStatement(conn);
+        String sql = "select * from user";
+        ResultSet rs = DB.getResultSet(stmt, sql);
+        List<User> users = new ArrayList<User>();
+        try {
+            while(rs.next()){
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setPhone(rs.getString("phone"));
+                user.setAddr(rs.getString("addr"));
+                user.setRdate(rs.getTimestamp("rdate"));
+                users.add(user);
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            DB.close(rs);
+            DB.close(stmt);
+            DB.close(conn);
+        }
+        return users;
+    }
+
+    public static int getUsersCount(List<User> users, int pageSize, int pageNum){
+        int count = 0;
+        Connection conn = DB.getConn();
+        Statement stmt = DB.getStatement(conn);
+        int start = (pageNum - 1) * pageSize;
+        String sql = "select * from user limit " + start + "," + pageSize;
+        ResultSet rs = DB.getResultSet(stmt, sql);
+        Statement cstmt = DB.getStatement(conn);
+        String csql = "select count(*) from user";
+        ResultSet crs = DB.getResultSet(cstmt, csql);
+
+        try{
+            crs.next();
+            count = crs.getInt(1);
+
+            while(rs.next()){
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setPhone(rs.getString("phone"));
+                user.setAddr(rs.getString("addr"));
+                user.setRdate(rs.getTimestamp("rdate"));
+                users.add(user);
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            DB.close(rs);
+            DB.close(crs);
+            DB.close(stmt);
+            DB.close(cstmt);
+            DB.close(conn);
+        }
+
+        return count;
     }
 }

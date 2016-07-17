@@ -76,7 +76,7 @@
                         <td><input type="password" name="password"/></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><input type="submit" value="注册" class="btn" /></td>
+                        <td colspan="2"><input type="submit" value="登录" class="btn" /></td>
                     </tr>
                     </tbody>
                 </table>
