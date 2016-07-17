@@ -1,0 +1,34 @@
+.navigation{
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.a{
+    border: 1px solid black;
+}
+.link-white a{
+    color: white;
+}
+table{
+    margin-top: 80px;
+}
+td{
+    text-align: center;
+}
+#middle{
+    margin-top: 80px;
+}
+.title{
+    height: 80px;
+}
+.title a{
+    color: #000000;
+}
+.img{
+    margin-top: 50px;
+    height: 300px;
+    width: 500px;
+    text-align: center;
+}

@@ -1,0 +1,22 @@
+.navigation{
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.a{
+    border: 1px solid black;
+}
+.link-white a{
+    color: white;
+}
+.link-black a{
+    color: black;
+}
+table{
+    margin-top: 80px;
+}
+td{
+    text-align: center;
+}
