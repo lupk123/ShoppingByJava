@@ -1,3 +1,4 @@
+<%@ page import="com.test.shopping.user.User" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -6,6 +7,22 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+//    String admin = (String)session.getAttribute("admin");
+//    if(admin != null && admin.equals("admin")){
+        String id = request.getParameter("id");
+        try{
+            int nid = Integer.parseInt(id);
+            User.del(nid);
+            response.sendRedirect("admin.jsp");
+        }catch(NumberFormatException e){
+            e.printStackTrace();
+            response.sendRedirect("admin.jsp");
+        }
+//    }else{
+//        response.sendRedirect("login.jsp");
+//    }
+%>
 <html>
 <head>
     <title></title>

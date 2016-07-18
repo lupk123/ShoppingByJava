@@ -157,6 +157,13 @@ public class User {
         return users;
     }
 
+    /**
+     * 获取用户总数量 并且 将用户装入users
+     * @param users 用户列表
+     * @param pageSize 每页显示的数量
+     * @param pageNum 页码
+     * @return 用户数量
+     */
     public static int getUsersCount(List<User> users, int pageSize, int pageNum){
         int count = 0;
         Connection conn = DB.getConn();
@@ -193,5 +200,23 @@ public class User {
         }
 
         return count;
+    }
+
+    /**
+     * 删除用户
+     * @param id 用户id
+     */
+    public static void del(int id){
+        Connection conn = DB.getConn();
+        Statement stmt = DB.getStatement(conn);
+        String sql = "delete from user where id = " + id;
+        try{
+            stmt.executeUpdate(sql);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            DB.close(stmt);
+            DB.close(conn);
+        }
     }
 }
