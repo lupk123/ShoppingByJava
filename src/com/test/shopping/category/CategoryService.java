@@ -3,7 +3,9 @@ package com.test.shopping.category;
 import com.test.shopping.util.DB;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/7/18.
@@ -39,10 +41,12 @@ public class CategoryService {
         PreparedStatement pstmt = DB.preparedStatement(conn, sql);
 
         try{
+            int cno = getNextCno(conn, c);
+
             pstmt.setInt(1, c.getId());
             pstmt.setString(2, c.getName());
             pstmt.setString(3, c.getDescr());
-            pstmt.setInt(4, c.getCno());
+            pstmt.setInt(4, cno);
             pstmt.setInt(5, c.getGrade());
             pstmt.executeUpdate();
             conn.commit();
@@ -107,9 +111,76 @@ public class CategoryService {
         return cno;
     }
 
+    /**
+     * 获取父亲节点的cno
+     * @param conn Connection
+     * @param child 孩子节点
+     * @return 父亲节点的cno
+     */
     public int getParentCno(Connection conn, Category child){
         int pno = 1;
         Statement stmt = DB.getStatement(conn);
+        String sql = "select cno from category where id = " + child.getPid();
+        ResultSet rs = DB.getResultSet(stmt, sql);
+
+        try{
+            rs.next();
+            pno = rs.getInt(1);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            DB.close(rs);
+            DB.close(stmt);
+        }
         return pno;
+    }
+
+
+    /**
+     * 从ResultSet中拿出category
+     * @param rs ResultSet
+     * @return category对象
+     */
+    public Category getCategoryFromRs(ResultSet rs){
+        Category c = new Category();
+        try{
+            c.setId(rs.getInt("id"));
+            c.setPid(rs.getInt("pid"));
+            c.setName(rs.getString("name"));
+            c.setDescr(rs.getString("descr"));
+            c.setCno(rs.getInt("cno"));
+            c.setGrade(rs.getInt("grade"));
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return c;
+    }
+
+    /**
+     * 获取category列表
+     * @return List<Category>
+     */
+    public List<Category> getCategories(){
+        List<Category> categories = new ArrayList<Category>();
+
+        Connection conn = DB.getConn();
+        Statement stmt = DB.getStatement(conn);
+        String sql = "select * from category order by cno";
+        ResultSet rs = DB.getResultSet(stmt, sql);
+
+        try{
+            while(rs.next()){
+                Category c = this.getCategoryFromRs(rs);
+                categories.add(c);
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            DB.close(rs);
+            DB.close(stmt);
+            DB.close(conn);
+        }
+
+        return categories;
     }
 }

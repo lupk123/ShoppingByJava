@@ -1,4 +1,46 @@
+<%@ page import="com.test.shopping.category.Category" %>
+<%@ page import="com.test.shopping.category.CategoryService" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    request.setCharacterEncoding("utf-8");
+    String action = request.getParameter("action");
+    String root = request.getParameter("root");
+    String pid = request.getParameter("pid");
+    if(action != null && root != null && action.trim().equals("post")){
+        String name = request.getParameter("name");
+        String descr = request.getParameter("descr");
+        Category c = new Category();
+
+        //插入根节点
+        if(root != null && root.trim().equals("1")){
+            c.setPid(0);
+            c.setName(name);
+            c.setDescr(descr);
+            c.setGrade(1);
+            CategoryService cs = CategoryService.getInstance();
+            cs.insert(c);
+            response.sendRedirect("category.jsp");
+        }else if(root != null && pid != null && root.trim().equals("2")){//插入第一层子节点
+            c.setPid(Integer.parseInt(pid));
+            c.setName(name);
+            c.setDescr(descr);
+            c.setGrade(2);
+            CategoryService cs = CategoryService.getInstance();
+            cs.insert(c);
+            response.sendRedirect("category.jsp");
+        }else if(root != null && pid != null && root.trim().equals("3")){ //插入第二层子节点3
+            c.setPid(Integer.parseInt(pid));
+            c.setName(name);
+            c.setDescr(descr);
+            c.setGrade(3);
+            CategoryService cs = CategoryService.getInstance();
+            cs.insert(c);
+            response.sendRedirect("category.jsp");
+        }else{
+            response.sendRedirect("category.jsp");
+        }
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,7 +189,10 @@
             </div>
         </div>
         <div class="col-sm-6 col-md-9">
-            <form>
+            <form method="post" action="categoryInsert.jsp">
+                <input type="hidden" name = "action" value = "post"/>
+                <input type="hidden" name = "root" value = "<%= request.getParameter("root")%>"/>
+                <input type="hidden" name = "pid" value = "<%= request.getParameter("pid")%>"/>
                 <table class="table">
                     <thead>
                     <tr>
