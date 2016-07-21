@@ -1,4 +1,8 @@
 <%@ page import="com.test.shopping.user.User" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.test.shopping.category.Category" %>
+<%@ page import="com.test.shopping.category.CategoryService" %>
+<%@ page import="java.util.ArrayList" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -12,6 +16,29 @@
     if(session.getAttribute("user") != null){
         user = (User)session.getAttribute("user");
     }
+%>
+<%!
+    private List<Category> getTopCategories(List<Category> categories){
+        List<Category> topCategories = new ArrayList<Category>();
+        for(Category c : categories){
+            if(c.getGrade() == 1)
+                topCategories.add(c);
+        }
+        return topCategories;
+    }
+
+    private List<Category> getChild(List<Category> categories, Category p){
+        List<Category> childs = new ArrayList<Category>();
+        for(Category c: categories){
+            if(c.getPid() == p.getId())
+                childs.add(c);
+        }
+        return childs;
+    }
+%>
+<%
+    List<Category> categories = CategoryService.getInstance().getCategories();
+    List<Category> topCategories = getTopCategories(categories);
 %>
 <html lang="zh-CN">
 <head>
@@ -72,16 +99,42 @@
     <div id = "middle">
         <div class="row">
             <div class="col-md-2 col-md-offset-1">
-                <ul class="list-unstyled ul-modify">
-                    <li class="li-modify">女装</li>
-                    <li class="li-modify">鞋靴</li>
-                    <li class="li-modify">运动</li>
-                    <li class="li-modify">生活</li>
-                    <li class="li-modify">数码</li>
-                    <li class="li-modify">美妆</li>
-                    <li class="li-modify">家居</li>
-                    <li class="li-modify">办公</li>
-                </ul>
+                <div class="panel-group" id="accordion">
+                    <%
+                        for(Category c : topCategories){
+                    %>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse<%= c.getId()%>"><%= c.getName()%></a>
+                            </h4>
+                        </div>
+                        <div id="collapse<%= c.getId()%>" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table">
+                                    <%
+                                        List<Category> childs1 = this.getChild(categories, c);
+                                        for(Category c1: childs1){
+                                            List<Category> childs = this.getChild(categories, c1);
+                                            for(Category child : childs){
+                                    %>
+                                    <tr>
+                                        <td>
+                                            <a href="searchResult.jsp?categoryid=<%= child.getId()%>"> <%= child.getName()%></a>
+                                        </td>
+                                    </tr>
+                                    <%
+                                            }
+                                        }
+                                    %>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <%
+                        }
+                    %>
+                 </div>
             </div>
             <div class="col-md-5 img">
                 <img src="img/test.jpg"/>

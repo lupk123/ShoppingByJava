@@ -1,53 +1,51 @@
-<%@ page import="com.test.shopping.product.Product" %>
+<%@ page import="com.test.shopping.category.Category" %>
+<%@ page import="com.test.shopping.category.CategoryService" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.test.shopping.product.Product" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="com.test.shopping.product.ProductMgr" %>
+<%@ page import="javax.xml.ws.Response" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
-  Date: 2016/7/18
-  Time: 14:56
+  Date: 2016/7/21
+  Time: 9:43
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    //    String admin = (String)session.getAttribute("admin");
-//    if(admin == null || !admin.equals("admin"))
-//        response.sendRedirect("login.jsp");
-%>
-<%
-    final int PAGE_SIZE = 2; //每页显示多少条记录
-    final int PAGES_PER_TIME = 7;//每次显示多少个页码链接
-    int pageNum = 1;
+    request.setCharacterEncoding("utf-8");
+    String action = request.getParameter("action");
+    if(action != null && action.equals("post")){
+        String name = request.getParameter("name");
+        String descr = request.getParameter("descr");
+        double normalprice = Double.parseDouble(request.getParameter("normalprice"));
+        double memberprice = Double.parseDouble(request.getParameter("memberprice"));
 
-    String pageN = request.getParameter("pageNum");
-    if(pageN != null && !pageN.trim().equals("")){
-        try{
-            pageNum = Integer.parseInt(pageN);
-        }catch (NumberFormatException e){
-            pageNum = 1;
+        int categoryid = -1;
+        String strCategoryid = request.getParameter("categoryid");
+        if(strCategoryid != null && !strCategoryid.trim().equals("")) {
+            categoryid = Integer.parseInt(strCategoryid);
         }
-        if(pageNum <= 0)
-            pageNum = 1;
+        Product p = new Product();
+        p.setName(name);
+        p.setDescr(descr);
+        p.setNromalprice(normalprice);
+        p.setMemberprice(memberprice);
+        p.setPdate(new Date());
+        p.setCategoryid(categoryid);
+        ProductMgr.getInstance().insert(p);
+        response.sendRedirect("product.jsp");
     }
 
 %>
-<%
-    List<Product> products = new ArrayList<Product>();
-    int count = ProductMgr.getInstance().getProducts(products, pageNum, PAGE_SIZE, false);
-    int totalPages = count % PAGE_SIZE == 0 ? count / PAGE_SIZE : count / PAGE_SIZE + 1;
-    if(pageNum > totalPages)
-        pageNum = totalPages;
-//    System.out.print(totalPages);
-%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>后台管理</title>
+    <title>添加产品</title>
     <link href="../code/css/bootstrap.min.css" rel="stylesheet">
-    <script src="../code/js/jquery-3.0.0.min.js"></script>
-    <script src="../code/js/bootstrap.min.js"></script>
     <style type="text/css">
         .navbar-header h3{
             margin-top: 10px;
@@ -61,20 +59,6 @@
         div.panel{margin-bottom: 30px;}
         h1.title{margin-bottom: 20px;}
     </style>
-    <script type="text/javascript">
-        function checkDelete(){
-            var ids = document.getElementsByName("id");
-            if(document.formDelete.selectAll.checked) {
-                for(var i = 0; i < ids.length; i++) {
-                    ids[i].checked = "checked";
-                }
-            } else {
-                for(var i = 0; i < ids.length; i++) {
-                    ids[i].checked = "";
-                }
-            }
-        }
-    </script>
 </head>
 <body>
 <nav class="navbar navbar-default navbar-fixed-top">
@@ -203,96 +187,62 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-9 col-md-9">
-            <div class="well">
-                <div class="col-md-3">
-                    <h1 class="title">产品列表</h1>
-                </div>
-                <div class="col-md-6 col-md-offset-3">
-                    <ul class="pagination pagination-right">
-                        <%
-                            int s = (pageNum - 1) / PAGES_PER_TIME * PAGES_PER_TIME + 1;
-                            int e = s + PAGES_PER_TIME;
-                            if(pageNum <= 1)
-                                out.println("<li class = 'disabled'><a href='#'>Prev</a></li>");
-                            else
-                                out.println("<li><a href='product.jsp?pageNum="+(pageNum-1)+"'>Prev</a></li>");
-                            for(int i = s; i < e; i++){
-                                if(i == pageNum)
-                                    out.println("<li class = 'active'><a href='product.jsp?pageNum="+i+"'>"+i+"</a></li>");
-                                else if(i > totalPages)
-                                    out.println(" <li class = 'disabled'><a href='#'>"+i+"</a></li>");
-                                else{
-                        %>
-                        <li><a href="product.jsp?pageNum=<%= i%>"><%= i%></a></li>
-                        <%
+        <div class="col-sm-6 col-md-9">
+            <form method="post" action="productAdd.jsp">
+                <input type="hidden" name = "action" value = "post"/>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <td colspan="2"><span class = "h3">添加产品</span></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>名称: </td>
+                        <td><input type="text" name="name"></td>
+                    </tr>
+                    <tr>
+                        <td>描述：</td>
+                        <td><input type="text" name="descr"></td>
+                    </tr>
+                    <tr>
+                        <td>普通价格：</td>
+                        <td><input type="text" name="normalprice"></td>
+                    </tr>
+                    <tr>
+                        <td>会员价格：</td>
+                        <td><input type="text" name="memberprice"></td>
+                    </tr>
+                    <tr>
+                        <td>所属类别：</td>
+                        <td>
+                            <select name="categoryid">
+                            <%
+                                List<Category> categories = CategoryService.getInstance().getCategories();
+                                for(Category c : categories) {
+                                    String selected = "";
+                                    String preStr = "";
+                                    for(int i = 1; i < c.getGrade(); i++) preStr += "--";
+                            %>
+                            <option value="<%=c.getId()%>"><%=preStr + c.getName()%></option>
+                            <%
                                 }
-                            }
-                            if(pageNum == totalPages)
-                                out.println(" <li class = 'disabled'><a href='#'>Next</a></li>");
-                            else{
-                        %>
-                        <li><a href="product.jsp?pageNum=<%= pageNum + 1%>">Next</a></li>
-                        <%
-                            }
-                        %>
-                    </ul>
-                </div>
-                <form action="productDeleteMultiple.jsp" name="formDelete" method="post">
-                    <table class="table table-striped">
-                        <tr>
-                            <td colspan="8" style="text-align: center">
-                                <a href = "productAdd.jsp">添加产品</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>选择</td>
-                            <td>产品名称</td>
-                            <td>产品描述</td>
-                            <td>普通价格</td>
-                            <td>会员价格</td>
-                            <td>上架时间</td>
-                            <td>所属类别</td>
-                            <td>操作</td>
-                        </tr>
-                        <%
-                            for(Product p : products){
-                        %>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="id" value="<%= p.getId()%>"/>
-                            </td>
-                            <td><%= p.getName()%></td>
-                            <td><%= p.getDescr()%></td>
-                            <td><%= p.getNromalprice()%></td>
-                            <td><%= p.getMemberprice()%></td>
-                            <td>
-                                <%=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(p.getPdate())%>
-                            </td>
-                            <td><%= p.getCategory().getName()%></td>
-                            <td>
-                                <a href="productDelete.jsp?id=<%=p.getId()%>" onclick="return confirm('真的要删?')">删</a>
-                                <a target="detail" href="productModify.jsp?id=<%=p.getId()%>">改</a>
-                                <a target="detail" href="productUpload.jsp?id=<%=p.getId()%>">上传</a>
-                            </td>
-                        </tr>
-                        <%
-                            }
-                        %>
-                        <tr>
-                        <tr>
-                            <td>
-                                <input name="selectAll" type="checkbox" onclick="checkDelete()"/>
-                            </td>
-                            <td>
-                                <input type="submit" class = "btn" value="Delete"/>
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
+                            %>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" value = "添加" class="btn btn-info"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
         </div>
     </div>
 </div>
+<script src="../code/js/jquery-3.0.0.min.js"></script>
+<script src="../code/js/bootstrap.min.js"></script>
+
 </body>
 </html>

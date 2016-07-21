@@ -43,7 +43,7 @@ public class CategoryService {
         try{
             int cno = getNextCno(conn, c);
 
-            pstmt.setInt(1, c.getId());
+            pstmt.setInt(1, c.getPid());
             pstmt.setString(2, c.getName());
             pstmt.setString(3, c.getDescr());
             pstmt.setInt(4, cno);
