@@ -219,4 +219,27 @@ public class User {
             DB.close(conn);
         }
     }
+
+    public static int check(String username){
+        Connection conn = DB.getConn();
+        Statement stmt = DB.getStatement(conn);
+        String sql = "select * from user where username = '" + username + "'";
+        ResultSet rs = DB.getResultSet(stmt, sql);
+        int count = 0;
+        List<User> users = new ArrayList<User>();
+        try {
+            if(!rs.next())
+                count = 0;
+            else {
+                count = rs.getInt(1);
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }finally {
+            DB.close(rs);
+            DB.close(stmt);
+            DB.close(conn);
+        }
+        return count;
+    }
 }

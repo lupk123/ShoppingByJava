@@ -33,6 +33,37 @@
     <title>在线尝试 Bootstrap 实例</title>
     <link href="code/css/bootstrap.min.css" rel="stylesheet">
     <link href = "code/css/register.css" rel="stylesheet"/>
+    <script src="code/js/jquery-3.0.0.min.js"></script>
+    <script src="code/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function(){
+            $("#username").focus();
+        }
+        function validate() {
+            var id = $("#username").val();
+            var url = "validate.jsp";
+            $.ajax({
+                type: "post",
+                data:{id:id},
+                url: url,
+                dataType: "json",
+                success: function (data) {
+                    var str = data.return;
+                    if(str == "valid")
+                    {
+                        $("#extract").text("congratulations! you can use this username!");
+                    }
+                    else if(str == "invalid")
+                    {
+                        $("#extract").text("username exists");
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+//                    document.write(errorThrown);
+                }
+            })
+        }
+    </script>
 </head>
 <body>
 <div class="container-fluid">
@@ -62,7 +93,11 @@
                 <tbody>
                     <tr>
                         <td>昵称：</td>
-                        <td><input type="text" name="username"/></td>
+                        <td>
+                            <input type="text" name="username" id = "username" onblur="validate()"/>
+                            <br>
+                            <span id = "extract"></span>
+                        </td>
                     </tr>
                     <tr>
                         <td>密码：</td>
@@ -84,8 +119,5 @@
         </form>
     </div>
 </div>
-
-<script src="code/js/jquery-3.0.0.min.js"></script>
-<script src="code/js/bootstrap.min.js"></script>
 </body>
 </html>
