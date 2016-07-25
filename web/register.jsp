@@ -43,17 +43,17 @@
             var id = $("#username").val();
             var url = "validate.jsp";
             $.ajax({
-                type: "post",
+                type: "get",
                 data:{id:id},
                 url: url,
                 dataType: "json",
                 success: function (data) {
                     var str = data.return;
-                    if(str == "valid")
+                    if(str == "invalid")
                     {
                         $("#extract").text("congratulations! you can use this username!");
                     }
-                    else if(str == "invalid")
+                    else if(str == "valid")
                     {
                         $("#extract").text("username exists");
                     }
